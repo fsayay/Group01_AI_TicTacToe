@@ -27,11 +27,12 @@ public class FrmGame extends javax.swing.JFrame implements ActionListener{
     private String player1;  //  le corresponde la marca O
     private String player2;  //  le corresponde la marca X
     private int turn = 0;
-       
+    private String winner="";   
     public FrmGame(String player2, String algorithm) {
         super("Tic Tac Toe");
         initComponents();
-        BOARD =new Box[3][3];
+        fillBoard();
+        /*BOARD =new Box[3][3];
         for( int i = 0; i < 3; i++){
             for (int j = 0; j < 3; j++){
                 BOARD [i][j] = new Box();
@@ -39,7 +40,7 @@ public class FrmGame extends javax.swing.JFrame implements ActionListener{
                 BOARD [i][j].A.addActionListener(this);
                 this.panel2.add(BOARD[i][j].A);
             }
-        }
+        }*/
         
         this.player2 = player2;
         SwingUtils.setEnableContainer(panelShadow2, false);
@@ -378,10 +379,10 @@ public class FrmGame extends javax.swing.JFrame implements ActionListener{
                   //if(BOARD[i][j].isGAP()){  
                     putMark(BOARD[i][j]);
                     cont ++ ;
-                    if(revisar()){
+                    /*if(revisar()){
                         JOptionPane.showMessageDialog(null, "UD. ha Ganado");
                         SwingUtils.setEnableContainer(panelShadow2, false);
-                    }
+                    }*/
                     
                   //}else{
                     //  JOptionPane.showMessageDialog(null, "Movimiento no valido");
@@ -395,19 +396,33 @@ public class FrmGame extends javax.swing.JFrame implements ActionListener{
     public void putMark(Box button){
         ImageIcon icon = null;
         if(this.turn == 0){
-            icon = new ImageIcon(this.getClass().getResource("o.jpg"));
+            icon = new ImageIcon(this.getClass().getResource("/imagesAI/o.jpg"));
+            icon = new ImageIcon(icon.getImage().getScaledInstance( 90, 90, java.awt.Image.SCALE_DEFAULT));
+            button.A.setIcon(icon);
             this.turn = 1;
             button.B = 4;
+            if(revisar()){
+                winner = this.textFieldRectBackground1.getText();
+                JOptionPane.showMessageDialog(null, this.winner+" ha Ganado");
+                SwingUtils.setEnableContainer(panel2, false);
+            }
             this.textFieldRectBackground1.setText(this.player1);
                     
         }else{
-            icon = new ImageIcon(this.getClass().getResource("x.jpg"));
+            icon = new ImageIcon(this.getClass().getResource("/imagesAI/x.jpg"));
+            icon = new ImageIcon(icon.getImage().getScaledInstance( 90, 90, java.awt.Image.SCALE_DEFAULT));
+            button.A.setIcon(icon);
             this.turn = 0;
             button.B = 1;
+            if(revisar()){
+                winner = this.textFieldRectBackground1.getText();
+                JOptionPane.showMessageDialog(null, this.winner+" ha Ganado");
+                SwingUtils.setEnableContainer(panel2, false);
+            }
             this.textFieldRectBackground1.setText(this.player2);
         }
-        icon = new ImageIcon(icon.getImage().getScaledInstance( 90, 90, java.awt.Image.SCALE_DEFAULT));
-        button.A.setIcon(icon);
+        /*icon = new ImageIcon(icon.getImage().getScaledInstance( 90, 90, java.awt.Image.SCALE_DEFAULT));
+        button.A.setIcon(icon);*/
         button.A.removeActionListener(this);
     }
     
@@ -443,6 +458,18 @@ public class FrmGame extends javax.swing.JFrame implements ActionListener{
         }
         
         return gano;
+    }
+    
+    public void fillBoard(){
+        BOARD =new Box[3][3];
+        for( int i = 0; i < 3; i++){
+            for (int j = 0; j < 3; j++){
+                BOARD [i][j] = new Box();
+                BOARD [i][j].A.setBounds((i*45)+10, (j*45)+10, 42, 42);
+                BOARD [i][j].A.addActionListener(this);
+                this.panel2.add(BOARD[i][j].A);
+            }
+        }
     }
 
     
