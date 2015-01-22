@@ -9,7 +9,10 @@ package tictactoeAI;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
+import java.util.Arrays;
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 
 /**
@@ -24,13 +27,33 @@ public class FrmGame extends javax.swing.JFrame implements ActionListener{
      * Creates new form FrmGame
      */
     private String algorithm;
-    private String player1;  //  le corresponde la marca O
-    private String player2;  //  le corresponde la marca X
-    private int turn = 0;
-    private String winner="";   
+    private String player1, player2;
+    private String winner="";
+    
+    /*Jugadores.*/
+    ComputadoraIA computer;
+    boolean playing, finished;
+    
+    public final int MANvsMAN = 1;
+    public final int MANvsMACHINE = 2;
+    
+    /*Turno de jugador.*/
+    int turn = 0;
+    int GeneralTurn = 0;
+    
+    private JOptionPane message;
+    public int game_type = 0;
+    public final int PLAYER1 = 1;
+    public final int PLAYER2 = 2;
+    public boolean THINKING = false;
+    public int[] Board = new int[9]; 
+    
     public FrmGame(String player2, String algorithm) {
         super("Tic Tac Toe");
         initComponents();
+        this.labelMetric5.setText("Play TIC TAC TOE!");
+        
+        Arrays.fill(Board, 0);
         fillBoard();
         /*BOARD =new Box[3][3];
         for( int i = 0; i < 3; i++){
@@ -42,6 +65,8 @@ public class FrmGame extends javax.swing.JFrame implements ActionListener{
             }
         }*/
         
+        message = new JOptionPane();
+        
         this.player2 = player2;
         SwingUtils.setEnableContainer(panelShadow2, false);
         SwingUtils.setEnableContainer(panelShadow5, false);
@@ -49,6 +74,29 @@ public class FrmGame extends javax.swing.JFrame implements ActionListener{
             textField2.setEditable(false);
             textField2.setText(this.player2);
         }
+    }
+    
+    public boolean recojer(){
+
+        /*Comprobamos que los campos estén llenos.*/
+        if( this.textField1.getText().equals("") ){
+            message.showMessageDialog(this,"Fill player 1 name please.","[X] Error:",JOptionPane.ERROR_MESSAGE);
+            return false;   
+        }
+        if( this.textField2.getText().equals("") ){
+            message.showMessageDialog(this,"Fill player 2 name please.","[X] Error:",JOptionPane.ERROR_MESSAGE);
+            return false;   
+        }
+        if( this.textField1.getText().equals( this.textField2.getText() )){
+            message.showMessageDialog(this,"Write diferents names to players.","[X] Error:",JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+        
+        /*Recojemos los valores.*/
+        this.player1 = this.textField1.getText();
+        this.player2 = this.textField2.getText();
+        
+        return true;
     }
 
     /**
@@ -70,13 +118,14 @@ public class FrmGame extends javax.swing.JFrame implements ActionListener{
         textField2 = new org.edisoncor.gui.textField.TextField();
         buttonRound1 = new org.edisoncor.gui.button.ButtonRound();
         buttonRound2 = new org.edisoncor.gui.button.ButtonRound();
+        panelImage4 = new org.edisoncor.gui.panel.PanelImage();
+        panelImage5 = new org.edisoncor.gui.panel.PanelImage();
         panelShadow5 = new org.edisoncor.gui.panel.PanelShadow();
         labelMetric4 = new org.edisoncor.gui.label.LabelMetric();
         panelShadow2 = new org.edisoncor.gui.panel.PanelShadow();
         panelImage3 = new org.edisoncor.gui.panel.PanelImage();
         panel2 = new org.edisoncor.gui.panel.Panel();
-        labelMetric3 = new org.edisoncor.gui.label.LabelMetric();
-        textFieldRectBackground1 = new org.edisoncor.gui.textField.TextFieldRectBackground();
+        labelMetric5 = new org.edisoncor.gui.label.LabelMetric();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setBackground(new java.awt.Color(0, 0, 0));
@@ -131,46 +180,83 @@ public class FrmGame extends javax.swing.JFrame implements ActionListener{
             }
         });
 
+        panelImage4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagesAI/o.gif"))); // NOI18N
+
+        javax.swing.GroupLayout panelImage4Layout = new javax.swing.GroupLayout(panelImage4);
+        panelImage4.setLayout(panelImage4Layout);
+        panelImage4Layout.setHorizontalGroup(
+            panelImage4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 64, Short.MAX_VALUE)
+        );
+        panelImage4Layout.setVerticalGroup(
+            panelImage4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 67, Short.MAX_VALUE)
+        );
+
+        panelImage5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagesAI/x.png"))); // NOI18N
+
+        javax.swing.GroupLayout panelImage5Layout = new javax.swing.GroupLayout(panelImage5);
+        panelImage5.setLayout(panelImage5Layout);
+        panelImage5Layout.setHorizontalGroup(
+            panelImage5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 62, Short.MAX_VALUE)
+        );
+        panelImage5Layout.setVerticalGroup(
+            panelImage5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 59, Short.MAX_VALUE)
+        );
+
         javax.swing.GroupLayout panelShadow1Layout = new javax.swing.GroupLayout(panelShadow1);
         panelShadow1.setLayout(panelShadow1Layout);
         panelShadow1Layout.setHorizontalGroup(
             panelShadow1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panelShadow1Layout.createSequentialGroup()
+                .addContainerGap()
                 .addGroup(panelShadow1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(panelShadow1Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addGroup(panelShadow1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(panelShadow1Layout.createSequentialGroup()
-                                .addComponent(labelMetric1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(textField1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                            .addGroup(panelShadow1Layout.createSequentialGroup()
-                                .addComponent(labelMetric2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(textField2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelShadow1Layout.createSequentialGroup()
-                        .addGap(28, 28, 28)
-                        .addComponent(buttonRound1, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 18, Short.MAX_VALUE)
-                        .addComponent(buttonRound2, javax.swing.GroupLayout.PREFERRED_SIZE, 97, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(labelMetric1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(textField1, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(panelImage5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(panelShadow1Layout.createSequentialGroup()
+                        .addComponent(labelMetric2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(textField2, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(panelImage4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(19, 19, 19))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelShadow1Layout.createSequentialGroup()
+                .addGap(28, 28, 28)
+                .addComponent(buttonRound1, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(buttonRound2, javax.swing.GroupLayout.PREFERRED_SIZE, 97, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
         panelShadow1Layout.setVerticalGroup(
             panelShadow1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panelShadow1Layout.createSequentialGroup()
-                .addGap(38, 38, 38)
-                .addGroup(panelShadow1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(labelMetric1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(textField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addGroup(panelShadow1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(labelMetric2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(textField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(110, 110, 110)
+                .addGroup(panelShadow1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                    .addGroup(panelShadow1Layout.createSequentialGroup()
+                        .addGap(30, 30, 30)
+                        .addGroup(panelShadow1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(labelMetric1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(textField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(85, 85, 85)
+                        .addGroup(panelShadow1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(labelMetric2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(textField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(59, 59, 59))
+                    .addGroup(panelShadow1Layout.createSequentialGroup()
+                        .addGap(19, 19, 19)
+                        .addComponent(panelImage5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(panelImage4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(34, 34, 34)))
                 .addGroup(panelShadow1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(buttonRound2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(buttonRound1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(83, Short.MAX_VALUE))
         );
 
         panelShadow5.setBorder(javax.swing.BorderFactory.createMatteBorder(1, 1, 1, 1, new java.awt.Color(0, 153, 153)));
@@ -198,7 +284,7 @@ public class FrmGame extends javax.swing.JFrame implements ActionListener{
 
         panelImage3.setBackground(new java.awt.Color(255, 255, 255));
         panelImage3.setBorder(javax.swing.BorderFactory.createMatteBorder(1, 1, 1, 1, new java.awt.Color(255, 255, 255)));
-        panelImage3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagesAI/backimage.jpg"))); // NOI18N
+        panelImage3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagesAI/imagen_2.jpg"))); // NOI18N
 
         javax.swing.GroupLayout panel2Layout = new javax.swing.GroupLayout(panel2);
         panel2.setLayout(panel2Layout);
@@ -228,11 +314,7 @@ public class FrmGame extends javax.swing.JFrame implements ActionListener{
                 .addContainerGap(25, Short.MAX_VALUE))
         );
 
-        labelMetric3.setText("Turn");
-
-        textFieldRectBackground1.setToolTipText("");
-        textFieldRectBackground1.setDescripcion("");
-        textFieldRectBackground1.setDoubleBuffered(true);
+        labelMetric5.setToolTipText("");
 
         javax.swing.GroupLayout panelShadow2Layout = new javax.swing.GroupLayout(panelShadow2);
         panelShadow2.setLayout(panelShadow2Layout);
@@ -240,25 +322,19 @@ public class FrmGame extends javax.swing.JFrame implements ActionListener{
             panelShadow2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panelShadow2Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(panelImage3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(panelShadow2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(panelImage3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(labelMetric5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
-            .addGroup(panelShadow2Layout.createSequentialGroup()
-                .addGap(31, 31, 31)
-                .addComponent(labelMetric3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(27, 27, 27)
-                .addComponent(textFieldRectBackground1, javax.swing.GroupLayout.PREFERRED_SIZE, 116, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(21, Short.MAX_VALUE))
         );
         panelShadow2Layout.setVerticalGroup(
             panelShadow2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panelShadow2Layout.createSequentialGroup()
-                .addGap(12, 12, 12)
-                .addGroup(panelShadow2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(labelMetric3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(textFieldRectBackground1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
+                .addGap(13, 13, 13)
+                .addComponent(labelMetric5, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(panelImage3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(70, Short.MAX_VALUE))
+                .addContainerGap(72, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout panelImage1Layout = new javax.swing.GroupLayout(panelImage1);
@@ -330,19 +406,24 @@ public class FrmGame extends javax.swing.JFrame implements ActionListener{
 
     private void buttonRound1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonRound1ActionPerformed
         // TODO add your handling code here:
-        SwingUtils.setEnableContainer(panelShadow2, true);
-        this.turn = 0;
-        this.textFieldRectBackground1.setEditable(false);
-        this.player1 = this.textField1.getText();
-        this.player2 = this.textField2.getText();
+        if(recojer()){
+            SwingUtils.setEnableContainer(panelShadow2, true);
+            this.turn = 0;
+            this.player1 = this.textField1.getText();
+            this.player2 = this.textField2.getText();
 
-        int random = (int)(Math.random()*10);
-        if(random <= 5)
-        this.textFieldRectBackground1.setText(this.player2);
-        else
-        this.textFieldRectBackground1.setText(this.player1);
+            int random = (int)(Math.random()*10);
+            if(random <= 5)
+            mensaje("Turno de " + this.textField1.getText() );
+            else
+            mensaje("Turno de " + this.textField2.getText() );
+        }
     }//GEN-LAST:event_buttonRound1ActionPerformed
 
+    public void mensaje(String mensaje){
+        this.labelMetric5.setText(mensaje);
+    }
+    
     private void buttonRound2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonRound2ActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_buttonRound2ActionPerformed
@@ -356,19 +437,20 @@ public class FrmGame extends javax.swing.JFrame implements ActionListener{
     private org.edisoncor.gui.button.ButtonRound buttonRound2;
     private org.edisoncor.gui.label.LabelMetric labelMetric1;
     private org.edisoncor.gui.label.LabelMetric labelMetric2;
-    private org.edisoncor.gui.label.LabelMetric labelMetric3;
     private org.edisoncor.gui.label.LabelMetric labelMetric4;
+    private org.edisoncor.gui.label.LabelMetric labelMetric5;
     private org.edisoncor.gui.panel.Panel panel1;
     private org.edisoncor.gui.panel.Panel panel2;
     private org.edisoncor.gui.panel.PanelImage panelImage1;
     private org.edisoncor.gui.panel.PanelImage panelImage2;
     private org.edisoncor.gui.panel.PanelImage panelImage3;
+    private org.edisoncor.gui.panel.PanelImage panelImage4;
+    private org.edisoncor.gui.panel.PanelImage panelImage5;
     private org.edisoncor.gui.panel.PanelShadow panelShadow1;
     private org.edisoncor.gui.panel.PanelShadow panelShadow2;
     private org.edisoncor.gui.panel.PanelShadow panelShadow5;
     private org.edisoncor.gui.textField.TextField textField1;
     private org.edisoncor.gui.textField.TextField textField2;
-    private org.edisoncor.gui.textField.TextFieldRectBackground textFieldRectBackground1;
     // End of variables declaration//GEN-END:variables
 
     @Override
@@ -396,30 +478,35 @@ public class FrmGame extends javax.swing.JFrame implements ActionListener{
     public void putMark(Box button){
         ImageIcon icon = null;
         if(this.turn == 0){
-            icon = new ImageIcon(this.getClass().getResource("/imagesAI/o.jpg"));
+            icon = new ImageIcon(this.getClass().getResource("/imagesAI/o.gif"));
             icon = new ImageIcon(icon.getImage().getScaledInstance( 90, 90, java.awt.Image.SCALE_DEFAULT));
+            //button.A.setDisabledIcon(icon);
             button.A.setIcon(icon);
             this.turn = 1;
             button.B = 4;
             if(revisar()){
-                winner = this.textFieldRectBackground1.getText();
+//                this.labelMetric5.setText("Ha ganado "+this.player1);
+                winner = this.player1;
                 JOptionPane.showMessageDialog(null, this.winner+" ha Ganado");
+                resetGame();
                 SwingUtils.setEnableContainer(panel2, false);
             }
-            this.textFieldRectBackground1.setText(this.player1);
+            this.labelMetric5.setText("Turno de "+this.player2);
                     
         }else{
-            icon = new ImageIcon(this.getClass().getResource("/imagesAI/x.jpg"));
+            icon = new ImageIcon(this.getClass().getResource("/imagesAI/x.png"));
             icon = new ImageIcon(icon.getImage().getScaledInstance( 90, 90, java.awt.Image.SCALE_DEFAULT));
+            //button.A.setDisabledIcon(icon);
             button.A.setIcon(icon);
             this.turn = 0;
             button.B = 1;
             if(revisar()){
-                winner = this.textFieldRectBackground1.getText();
+//                this.labelMetric5.setText("Ha ganado "+this.player2);
+                winner = this.player2;
                 JOptionPane.showMessageDialog(null, this.winner+" ha Ganado");
                 SwingUtils.setEnableContainer(panel2, false);
             }
-            this.textFieldRectBackground1.setText(this.player2);
+            this.labelMetric5.setText("Turno de "+this.player1);
         }
         /*icon = new ImageIcon(icon.getImage().getScaledInstance( 90, 90, java.awt.Image.SCALE_DEFAULT));
         button.A.setIcon(icon);*/
@@ -460,17 +547,144 @@ public class FrmGame extends javax.swing.JFrame implements ActionListener{
         return gano;
     }
     
+    /*Método que pone una ficha por la computadora.*/
+//    public void ponerFichaCPU( int indice ){
+//        
+//        if( indice == -1 ) return;
+//        
+//        switch ( indice ){
+//            case 0: this.f1.setIcon( jugador2.obtenFicha() ); break;
+//            case 1: this.f2.setIcon( jugador2.obtenFicha() ); break;
+//            case 2: this.f3.setIcon( jugador2.obtenFicha() ); break;
+//            case 3: this.f4.setIcon( jugador2.obtenFicha() ); break;
+//            case 4: this.f5.setIcon( jugador2.obtenFicha() ); break;
+//            case 5: this.f6.setIcon( jugador2.obtenFicha() ); break;
+//            case 6: this.f7.setIcon( jugador2.obtenFicha() ); break;
+//            case 7: this.f8.setIcon( jugador2.obtenFicha() ); break;
+//            case 8: this.f9.setIcon( jugador2.obtenFicha() ); break;        
+//        }
+//        
+//        this.tablero[indice] = 2;
+//        
+//        /*Cambiamos el turno.*/
+//        turno = ( turno == JUGADOR1 ) ? JUGADOR2 : JUGADOR1;
+//                
+//    }
+    
+//    /*Método que "pone una ficha" en el tablero.*/
+//    public void ponerFicha( JLabel ficha ){
+//
+//        /*Obtenemos la casilla.*/
+//        int casilla = Integer.parseInt(""+ficha.getName().charAt(1)) - 1;
+//        
+//        /*Comprobamos si la casilla no estaba ocupada.*/
+//        if ( estaOcupada(casilla ) )
+//            return;
+//        
+//        /*Elegimos la ficha según el turno*/
+//        if ( turno == JUGADOR1 )
+//            ficha.setIcon( jugador1.obtenFicha() );
+//        else
+//            ficha.setIcon( jugador2.obtenFicha() );
+//        
+//        /*Guardamos la representación en el tablero*/
+//        tablero[casilla] = turno;
+//        
+//        /*Cambiamos el turno.*/
+//        turno = ( turno == JUGADOR1 ) ? JUGADOR2 : JUGADOR1;
+//        
+//    }
+    
+//    /*Método que dice si el juego está terminado.*/
+//    /*Regresa 0 si nadie gana, 1 si gana jugador 1 y 2 si gana jugador 2*/
+//    public int terminado(){
+//        /*Comprobamos si el juego terminó.*/
+//        /*Filas*/
+//        if ( tablero[0] == tablero[1] && tablero[0] == tablero[2] && tablero[0] != 0 )
+//            return tablero[0];
+//        else if ( tablero[3] == tablero[4] && tablero[3] == tablero[5]  && tablero[3] != 0  )
+//            return tablero[3];
+//        else if ( tablero[6] == tablero[7] && tablero[6]== tablero[8]  && tablero[6] != 0 )
+//            return tablero[6];
+//        /*Columnas*/
+//        else if( tablero[0] == tablero[3] && tablero[0] == tablero[6]  && tablero[0] != 0 )
+//            return tablero[0];
+//        else if ( tablero[1] == tablero[4] && tablero[1] == tablero[7]  && tablero[1] != 0  )
+//            return tablero[1];
+//        else if ( tablero[2] == tablero[5] && tablero[2] == tablero[8]  && tablero[2] != 0 )
+//            return tablero[2];
+//        /*Diagonales*/
+//        else if ( tablero[0] == tablero[4] && tablero[0] == tablero[8] && tablero[0] !=0 )
+//            return tablero[0];
+//        else if ( tablero[2] == tablero[4] && tablero[2] == tablero[6] && tablero[2] != 0 )
+//            return tablero[2];
+//        
+//        return 0;
+//        
+//    }
+    
+    /*Método que nos dice si el tablero se llenó.*/
+//    public boolean lleno(){
+//        boolean res = true;
+//        for ( int i = 0; i < tablero.length; i ++ )
+//            if ( tablero[i] == 0 )
+//                res = false;
+//        
+//        return res;
+//    }
+    
+//    /*Método que nos dice si una casilla está ocupada.*/
+//    public boolean estaOcupada( int casilla ){
+//        return ( tablero[casilla] != 0 );
+//    }
+//    
     public void fillBoard(){
         BOARD =new Box[3][3];
+        ImageIcon icon=null;
         for( int i = 0; i < 3; i++){
             for (int j = 0; j < 3; j++){
                 BOARD [i][j] = new Box();
                 BOARD [i][j].A.setBounds((i*45)+10, (j*45)+10, 42, 42);
+                //BOARD [i][j].A.setRolloverIcon(new ImageIcon("/images/ai3.png"));
+                //Boton.setRolloverIcon (new ImageIcon("Devil.gif"));
+                //icon = new ImageIcon(this.getClass().getResource("/imagesAI/x.png"));
+                //icon = new ImageIcon(icon.getImage().getScaledInstance( 90, 90, java.awt.Image.SCALE_DEFAULT));
+                //BOARD [i][j].A.setIcon(icon);
+                //button.A.setIcon(icon);
                 BOARD [i][j].A.addActionListener(this);
                 this.panel2.add(BOARD[i][j].A);
             }
-        }
+        }    
     }
-
     
+    /*Método que inicia un nuevo juego.*/
+    public void resetGame(){
+        
+        //Llenamos el tablero con 0s*/
+        Arrays.fill(Board,0);
+        
+        for( int i = 0; i < 3; i++){
+            for (int j = 0; j < 3; j++){
+                BOARD [i][j].A.setIcon(null);
+                BOARD [i][j].B = 0;
+            }
+        }
+        
+        /*Cambiamos el turno General.*/
+        if ( this.player2 == "Maquina" )
+            GeneralTurn = PLAYER1;
+        else
+            GeneralTurn = ( GeneralTurn == PLAYER1 ) ? PLAYER2 : PLAYER1;
+        
+        turn = GeneralTurn;
+        
+        /*Jugando.*/
+        if ( turn == PLAYER1 )
+            mensaje( "Turn of " +player1);
+        else
+            mensaje( "Turn of " +player2);
+        
+        playing = true;
+        finished = false;
+    }    
 }

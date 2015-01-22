@@ -6,59 +6,41 @@
 
 package tictactoeAI;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 
 /**
  *
  * @author fabian
  */
-    
-public class prueba extends javax.swing.JFrame implements ActionListener{
+public class prueba extends javax.swing.JFrame {
 
     /**
      * Creates new form prueba
      */
     Box [][] BOARD;
     int cont;
-    
+    /**
+     * Creates new form FrmGame
+     */
     private String algorithm;
-    private String player1;  //  le corresponde la marca O
-    private String player2;  //  le corresponde la marca X
+    private String player1, player2;
     private int turn = 0;
-    private int mark; // 0 = O and 1 = X
-    private int one = -1;
-    private int two = -1;
-    private int three = -1;
-    private int four = -1;
-    private int five = -1;
-    private int six = -1;
-    private int seven = -1;
-    private int eight = -1;
-    private int nine = -1;
+    private String winner="";  
     
-    public prueba(String player2, String algorithm) {
-        super("Tic Tac Toe");
+    private JOptionPane message;
+    public int tipo_juego = 0;
+    public final int HOMBREvsHOMBRE = 1;
+    public final int HOMBREvsCOMPUTADORA = 2;
+    boolean jugando, terminado;
+    public final int PLAYER1 = 1;
+    public final int PLAYER2 = 2;
+    public boolean THINKING = false;
+    public int[] tablero = new int[9];
+    public prueba() {
         initComponents();
-        BOARD =new Box[3][3];
-        for( int i = 0; i < 3; i++){
-            for (int j = 0; j < 3; j++){
-                BOARD [i][j] = new Box();
-                BOARD [i][j].A.setBounds((i*45)+10, (j*45)+10, 42, 42);
-                BOARD [i][j].A.addActionListener(this);
-                this.panel1.add(BOARD[i][j].A);
-            }
-        }
         
-        this.player2 = player2;
-        SwingUtils.setEnableContainer(panelShadow2, false);
-        SwingUtils.setEnableContainer(panelShadow5, false);
-        if(this.player2!=""){
-            textField2.setEditable(false);
-            textField2.setText(this.player2);
-        }        
+        
+        this.labelMetric3.setText("Juega al gato!");
     }
 
     /**
@@ -70,7 +52,9 @@ public class prueba extends javax.swing.JFrame implements ActionListener{
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        panelRectTranslucido1 = new org.edisoncor.gui.panel.PanelRectTranslucido();
+        panel1 = new org.edisoncor.gui.panel.Panel();
+        panelImage2 = new org.edisoncor.gui.panel.PanelImage();
+        panelImage1 = new org.edisoncor.gui.panel.PanelImage();
         panelShadow1 = new org.edisoncor.gui.panel.PanelShadow();
         labelMetric1 = new org.edisoncor.gui.label.LabelMetric();
         labelMetric2 = new org.edisoncor.gui.label.LabelMetric();
@@ -78,18 +62,30 @@ public class prueba extends javax.swing.JFrame implements ActionListener{
         textField2 = new org.edisoncor.gui.textField.TextField();
         buttonRound1 = new org.edisoncor.gui.button.ButtonRound();
         buttonRound2 = new org.edisoncor.gui.button.ButtonRound();
-        panelShadow2 = new org.edisoncor.gui.panel.PanelShadow();
-        panelImage1 = new org.edisoncor.gui.panel.PanelImage();
-        panel1 = new org.edisoncor.gui.panel.Panel();
-        labelMetric3 = new org.edisoncor.gui.label.LabelMetric();
-        textFieldRectBackground1 = new org.edisoncor.gui.textField.TextFieldRectBackground();
         panelShadow5 = new org.edisoncor.gui.panel.PanelShadow();
         labelMetric4 = new org.edisoncor.gui.label.LabelMetric();
-        panelImage2 = new org.edisoncor.gui.panel.PanelImage();
+        panelShadow2 = new org.edisoncor.gui.panel.PanelShadow();
+        panelImage3 = new org.edisoncor.gui.panel.PanelImage();
+        panel2 = new org.edisoncor.gui.panel.Panel();
+        labelMetric3 = new org.edisoncor.gui.label.LabelMetric();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        panelRectTranslucido1.setBackground(new java.awt.Color(153, 255, 153));
+        panelImage2.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        panelImage2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagesAI/artificial-intelligence-621_1.jpg"))); // NOI18N
+
+        javax.swing.GroupLayout panelImage2Layout = new javax.swing.GroupLayout(panelImage2);
+        panelImage2.setLayout(panelImage2Layout);
+        panelImage2Layout.setHorizontalGroup(
+            panelImage2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
+        );
+        panelImage2Layout.setVerticalGroup(
+            panelImage2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 69, Short.MAX_VALUE)
+        );
+
+        panelImage1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagesAI/artificial-intelligence-image.jpg"))); // NOI18N
 
         panelShadow1.setBackground(new java.awt.Color(255, 255, 153));
         panelShadow1.setBorder(javax.swing.BorderFactory.createMatteBorder(1, 1, 1, 1, new java.awt.Color(0, 153, 153)));
@@ -167,73 +163,6 @@ public class prueba extends javax.swing.JFrame implements ActionListener{
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        panelShadow2.setBorder(javax.swing.BorderFactory.createMatteBorder(1, 1, 1, 1, new java.awt.Color(0, 153, 153)));
-
-        panelImage1.setBackground(new java.awt.Color(255, 255, 255));
-        panelImage1.setBorder(javax.swing.BorderFactory.createMatteBorder(1, 1, 1, 1, new java.awt.Color(255, 255, 255)));
-        panelImage1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagesAI/backimage.jpg"))); // NOI18N
-
-        javax.swing.GroupLayout panel1Layout = new javax.swing.GroupLayout(panel1);
-        panel1.setLayout(panel1Layout);
-        panel1Layout.setHorizontalGroup(
-            panel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 151, Short.MAX_VALUE)
-        );
-        panel1Layout.setVerticalGroup(
-            panel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 153, Short.MAX_VALUE)
-        );
-
-        javax.swing.GroupLayout panelImage1Layout = new javax.swing.GroupLayout(panelImage1);
-        panelImage1.setLayout(panelImage1Layout);
-        panelImage1Layout.setHorizontalGroup(
-            panelImage1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(panelImage1Layout.createSequentialGroup()
-                .addGap(23, 23, 23)
-                .addComponent(panel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-        panelImage1Layout.setVerticalGroup(
-            panelImage1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(panelImage1Layout.createSequentialGroup()
-                .addGap(23, 23, 23)
-                .addComponent(panel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(26, Short.MAX_VALUE))
-        );
-
-        labelMetric3.setText("Turn");
-
-        textFieldRectBackground1.setToolTipText("");
-        textFieldRectBackground1.setDescripcion("");
-        textFieldRectBackground1.setDoubleBuffered(true);
-
-        javax.swing.GroupLayout panelShadow2Layout = new javax.swing.GroupLayout(panelShadow2);
-        panelShadow2.setLayout(panelShadow2Layout);
-        panelShadow2Layout.setHorizontalGroup(
-            panelShadow2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(panelShadow2Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(panelImage1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
-            .addGroup(panelShadow2Layout.createSequentialGroup()
-                .addGap(31, 31, 31)
-                .addComponent(labelMetric3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(27, 27, 27)
-                .addComponent(textFieldRectBackground1, javax.swing.GroupLayout.PREFERRED_SIZE, 116, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(18, Short.MAX_VALUE))
-        );
-        panelShadow2Layout.setVerticalGroup(
-            panelShadow2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(panelShadow2Layout.createSequentialGroup()
-                .addGap(12, 12, 12)
-                .addGroup(panelShadow2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(labelMetric3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(textFieldRectBackground1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addComponent(panelImage1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-
         panelShadow5.setBorder(javax.swing.BorderFactory.createMatteBorder(1, 1, 1, 1, new java.awt.Color(0, 153, 153)));
 
         labelMetric4.setText("Algorithm: ");
@@ -242,10 +171,10 @@ public class prueba extends javax.swing.JFrame implements ActionListener{
         panelShadow5.setLayout(panelShadow5Layout);
         panelShadow5Layout.setHorizontalGroup(
             panelShadow5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelShadow5Layout.createSequentialGroup()
-                .addContainerGap(45, Short.MAX_VALUE)
+            .addGroup(panelShadow5Layout.createSequentialGroup()
+                .addGap(24, 24, 24)
                 .addComponent(labelMetric4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(37, 37, 37))
+                .addContainerGap(144, Short.MAX_VALUE))
         );
         panelShadow5Layout.setVerticalGroup(
             panelShadow5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -255,46 +184,105 @@ public class prueba extends javax.swing.JFrame implements ActionListener{
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        panelImage2.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        panelImage2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagesAI/Tic-Tac-Toe-Free.jpg"))); // NOI18N
+        panelShadow2.setBorder(javax.swing.BorderFactory.createMatteBorder(1, 1, 1, 1, new java.awt.Color(0, 153, 153)));
 
-        javax.swing.GroupLayout panelImage2Layout = new javax.swing.GroupLayout(panelImage2);
-        panelImage2.setLayout(panelImage2Layout);
-        panelImage2Layout.setHorizontalGroup(
-            panelImage2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
+        panelImage3.setBackground(new java.awt.Color(255, 255, 255));
+        panelImage3.setBorder(javax.swing.BorderFactory.createMatteBorder(1, 1, 1, 1, new java.awt.Color(255, 255, 255)));
+        panelImage3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagesAI/backimage.jpg"))); // NOI18N
+
+        javax.swing.GroupLayout panel2Layout = new javax.swing.GroupLayout(panel2);
+        panel2.setLayout(panel2Layout);
+        panel2Layout.setHorizontalGroup(
+            panel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 155, Short.MAX_VALUE)
         );
-        panelImage2Layout.setVerticalGroup(
-            panelImage2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 69, Short.MAX_VALUE)
+        panel2Layout.setVerticalGroup(
+            panel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 153, Short.MAX_VALUE)
         );
 
-        javax.swing.GroupLayout panelRectTranslucido1Layout = new javax.swing.GroupLayout(panelRectTranslucido1);
-        panelRectTranslucido1.setLayout(panelRectTranslucido1Layout);
-        panelRectTranslucido1Layout.setHorizontalGroup(
-            panelRectTranslucido1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(panelRectTranslucido1Layout.createSequentialGroup()
+        javax.swing.GroupLayout panelImage3Layout = new javax.swing.GroupLayout(panelImage3);
+        panelImage3.setLayout(panelImage3Layout);
+        panelImage3Layout.setHorizontalGroup(
+            panelImage3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelImage3Layout.createSequentialGroup()
+                .addGap(24, 24, 24)
+                .addComponent(panel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        panelImage3Layout.setVerticalGroup(
+            panelImage3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelImage3Layout.createSequentialGroup()
+                .addGap(24, 24, 24)
+                .addComponent(panel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(25, Short.MAX_VALUE))
+        );
+
+        labelMetric3.setText("labelMetric3");
+
+        javax.swing.GroupLayout panelShadow2Layout = new javax.swing.GroupLayout(panelShadow2);
+        panelShadow2.setLayout(panelShadow2Layout);
+        panelShadow2Layout.setHorizontalGroup(
+            panelShadow2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelShadow2Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(panelRectTranslucido1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(panelImage2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(panelRectTranslucido1Layout.createSequentialGroup()
-                        .addComponent(panelShadow1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(panelShadow2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(panelShadow5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGroup(panelShadow2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(labelMetric3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(panelImage3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
-        panelRectTranslucido1Layout.setVerticalGroup(
-            panelRectTranslucido1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelRectTranslucido1Layout.createSequentialGroup()
+        panelShadow2Layout.setVerticalGroup(
+            panelShadow2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelShadow2Layout.createSequentialGroup()
+                .addGap(13, 13, 13)
+                .addComponent(labelMetric3, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(panelImage3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(13, Short.MAX_VALUE))
+        );
+
+        javax.swing.GroupLayout panelImage1Layout = new javax.swing.GroupLayout(panelImage1);
+        panelImage1.setLayout(panelImage1Layout);
+        panelImage1Layout.setHorizontalGroup(
+            panelImage1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelImage1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(panelShadow1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(panelShadow2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(panelShadow5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+        );
+        panelImage1Layout.setVerticalGroup(
+            panelImage1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelImage1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(panelImage1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(panelShadow2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(panelShadow5, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(panelShadow1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
+        );
+
+        javax.swing.GroupLayout panel1Layout = new javax.swing.GroupLayout(panel1);
+        panel1.setLayout(panel1Layout);
+        panel1Layout.setHorizontalGroup(
+            panel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(panel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(panelImage2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(panelImage1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
+        );
+        panel1Layout.setVerticalGroup(
+            panel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(panelImage2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(panelRectTranslucido1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(panelShadow2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(panelShadow1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(panelShadow5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(panelImage1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -302,11 +290,11 @@ public class prueba extends javax.swing.JFrame implements ActionListener{
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(panelRectTranslucido1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(panel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(panelRectTranslucido1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(panel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         pack();
@@ -322,24 +310,46 @@ public class prueba extends javax.swing.JFrame implements ActionListener{
 
     private void buttonRound1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonRound1ActionPerformed
         // TODO add your handling code here:
-        SwingUtils.setEnableContainer(panelShadow2, true);
-        this.turn = 0;
-        this.textFieldRectBackground1.setEditable(false);
-        this.player1 = this.textField1.getText();
-        this.player2 = this.textField2.getText();
+       if(recojer()){
+            SwingUtils.setEnableContainer(panelShadow2, true);
+            this.turn = 0;
+            this.player1 = this.textField1.getText();
+            this.player2 = this.textField2.getText();
 
-        int random = (int)(Math.random()*10);
-        if(random <= 5)
-        this.textFieldRectBackground1.setText(this.player2);
-        else
-        this.textFieldRectBackground1.setText(this.player1);
+            int random = (int)(Math.random()*10);
+            if(random <= 5)
+            mensaje("Turno de " + this.textField1.getText() );
+            else
+            mensaje("Turno de " + this.textField2.getText() );
+        }
     }//GEN-LAST:event_buttonRound1ActionPerformed
 
+    public boolean recojer(){
+
+        /*Comprobamos que los campos estén llenos.*/
+        if( this.textField1.getText().equals("") ){
+            message.showMessageDialog(this,"Fill player 1 name please.","[X] Error:",JOptionPane.ERROR_MESSAGE);
+            return false;   
+        }
+        if( this.textField2.getText().equals("") ){
+            message.showMessageDialog(this,"Fill player 2 name please.","[X] Error:",JOptionPane.ERROR_MESSAGE);
+            return false;   
+        }
+        if( this.textField1.getText().equals( this.textField2.getText() )){
+            message.showMessageDialog(this,"Write diferents names to players.","[X] Error:",JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+        
+        /*Recojemos los valores.*/
+        this.player1 = this.textField1.getText();
+        this.player2 = this.textField2.getText();
+        
+        return true;
+    }
     private void buttonRound2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonRound2ActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_buttonRound2ActionPerformed
 
-    
     /**
      * @param args the command line arguments
      */
@@ -370,9 +380,14 @@ public class prueba extends javax.swing.JFrame implements ActionListener{
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new prueba("","").setVisible(true);
+                new prueba().setVisible(true);
             }
         });
+    }
+    
+    /*Método que establece el texto de la etiqueta de descripción.*/
+    public void mensaje(String mensaje){
+        this.labelMetric3.setText(mensaje);
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -383,88 +398,14 @@ public class prueba extends javax.swing.JFrame implements ActionListener{
     private org.edisoncor.gui.label.LabelMetric labelMetric3;
     private org.edisoncor.gui.label.LabelMetric labelMetric4;
     private org.edisoncor.gui.panel.Panel panel1;
+    private org.edisoncor.gui.panel.Panel panel2;
     private org.edisoncor.gui.panel.PanelImage panelImage1;
     private org.edisoncor.gui.panel.PanelImage panelImage2;
-    private org.edisoncor.gui.panel.PanelRectTranslucido panelRectTranslucido1;
+    private org.edisoncor.gui.panel.PanelImage panelImage3;
     private org.edisoncor.gui.panel.PanelShadow panelShadow1;
     private org.edisoncor.gui.panel.PanelShadow panelShadow2;
     private org.edisoncor.gui.panel.PanelShadow panelShadow5;
     private org.edisoncor.gui.textField.TextField textField1;
     private org.edisoncor.gui.textField.TextField textField2;
-    private org.edisoncor.gui.textField.TextFieldRectBackground textFieldRectBackground1;
     // End of variables declaration//GEN-END:variables
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        for (int i = 0; i < 3; i++){
-            for (int j = 0; j < 3; j++){
-                if(e.getSource()== BOARD[i][j].A){
-                  //if(BOARD[i][j].isGAP()){  
-                    putMark(BOARD[i][j]);
-                    cont ++ ;
-                    if(revisar()){
-                        JOptionPane.showMessageDialog(null, "UD. ha Ganado");
-                        SwingUtils.setEnableContainer(panelShadow2, false);
-                    }
-                  //}else{
-                    //  JOptionPane.showMessageDialog(null, "Movimiento no valido");
-                  //}
-                    //System.out.println(i+" , "+j);
-                }
-            }
-        }
-    }
-    
-    public void putMark(Box button){
-        ImageIcon icon = null;
-        if(this.turn == 0){
-            icon = new ImageIcon(this.getClass().getResource("o.jpg"));
-            this.turn = 1;
-            button.B = 4;
-            this.textFieldRectBackground1.setText(this.player1);
-                    
-        }else{
-            icon = new ImageIcon(this.getClass().getResource("x.jpg"));
-            this.turn = 0;
-            button.B = 1;
-            this.textFieldRectBackground1.setText(this.player2);
-        }
-        icon = new ImageIcon(icon.getImage().getScaledInstance( 90, 90, java.awt.Image.SCALE_DEFAULT));
-        button.A.setIcon(icon);
-        button.A.removeActionListener(this);
-    }
-    
-    public boolean revisar(){
-        boolean gano = false;
-        int suma = 0;
-        for(int i = 0; i < 3; i++){
-            suma = BOARD[i][0].B + BOARD[i][1].B + BOARD[i][2].B;
-            if(suma == 3 || suma == 12){
-                gano = true;
-                break;
-            }
-        }
-        
-        for(int i = 0; i < 3; i++){
-            suma = BOARD[0][i].B + BOARD[1][i].B + BOARD[2][i].B;
-            if(suma == 3 || suma == 12){
-                gano = true;
-                break;
-            }
-        }
-        
-        suma = 0;
-        suma = BOARD[0][0].B + BOARD[1][1].B + BOARD[2][2].B;
-        if(suma == 3 || suma == 12){
-            gano = true;
-        }
-        
-        suma = 0;
-        suma = BOARD[0][2].B + BOARD[1][1].B + BOARD[2][0].B;
-        if(suma == 3 || suma == 12){
-            gano = true;
-        }
-        
-        return gano;
-    }
 }
