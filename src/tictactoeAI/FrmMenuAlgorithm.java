@@ -15,8 +15,9 @@ public class FrmMenuAlgorithm extends javax.swing.JFrame {
     /**
      * Creates new form FrmMenuAlgorithm
      */
-    private String algorithm="";
+    private String algorithm="BFS";
     public FrmMenuAlgorithm() {
+        super("AI: TIC TAC TOE");
         initComponents();
     }
 
@@ -189,7 +190,7 @@ public class FrmMenuAlgorithm extends javax.swing.JFrame {
     private void buttonRound1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonRound1ActionPerformed
         // TODO add your handling code here:
 
-        FrmGame game = new FrmGame("Maquina",this.algorithm);
+        FrmGame game = new FrmGame("COMPUTER",this.algorithm);
         game.setVisible(true);
         this.setVisible(false);
     }//GEN-LAST:event_buttonRound1ActionPerformed

@@ -22,63 +22,104 @@ import javax.swing.JOptionPane;
 public class FrmGame extends javax.swing.JFrame implements ActionListener{
 
     Box [][] BOARD;
-    int cont;
     /**
      * Creates new form FrmGame
      */
+    /*Algorithm  */
     private String algorithm;
-    private String player1, player2;
-    private String winner="";
+    private final int DFS = 1;
+    private final int BFS = 2;
     
-    /*Jugadores.*/
-    ComputadoraIA computer;
-    boolean playing, finished;
-    
+    /*Players.*/
+    private String player1,player2;
+    private ComputadoraIA computer;
+    private boolean playing, finished;
+    //private String winner="";
+    public final int PLAYER1 = 1;
+    public final int PLAYER2 = 2;
+    public boolean THINKING = false;
+       
+    /*Type Game  */
     public final int MANvsMAN = 1;
-    public final int MANvsMACHINE = 2;
+    public final int MANvsCOMPUTER = 2;
+    public int type_game = 1;
     
-    /*Turno de jugador.*/
+    /*Turn to Player.*/
     int turn = 0;
     int GeneralTurn = 0;
     
     private JOptionPane message;
-    public int game_type = 0;
-    public final int PLAYER1 = 1;
-    public final int PLAYER2 = 2;
-    public boolean THINKING = false;
+    
+    /*Vector to game representation*/
     public int[] Board = new int[9]; 
     
     public FrmGame(String player2, String algorithm) {
         super("Tic Tac Toe");
-        initComponents();
-        this.labelMetric5.setText("Play TIC TAC TOE!");
         
         Arrays.fill(Board, 0);
-        fillBoard();
-        /*BOARD =new Box[3][3];
-        for( int i = 0; i < 3; i++){
-            for (int j = 0; j < 3; j++){
-                BOARD [i][j] = new Box();
-                BOARD [i][j].A.setBounds((i*45)+10, (j*45)+10, 42, 42);
-                BOARD [i][j].A.addActionListener(this);
-                this.panel2.add(BOARD[i][j].A);
-            }
-        }*/
+        initComponents();
         
-        message = new JOptionPane();
-        
+        this.algorithm = algorithm;
         this.player2 = player2;
-        SwingUtils.setEnableContainer(panelShadow2, false);
+        
+        starMyComponents();
+    }
+    
+    public void starMyComponents(){
+        
+        fillBoard();
+        message("Play TIC TAC TOE !!");
+        message = new JOptionPane();
+        SwingUtils.setEnableContainer(panelImage3, false);
         SwingUtils.setEnableContainer(panelShadow5, false);
-        if(this.player2!=""){
+        if(this.player2!="" && this.algorithm != ""){
             textField2.setEditable(false);
             textField2.setText(this.player2);
+            this.labelMetric4.setText("Algorithm: "+this.algorithm);
+            this.type_game = 2;
         }
     }
     
-    public boolean recojer(){
+    public void starGame(){
+        
+        if ( type_game == MANvsMAN ){
+            this.player1 = textField1.getText();
+            this.player2 = textField2.getText();
+            
+        } else {
+            /*Players*/
+            this.player1 = textField1.getText();
+            this.player2 = textField2.getText();           
+            /*Create the instance to computer.*/
+            computer = new ComputadoraIA(algorithmType(algorithm));
+            
+        }
+        
+        /*We start the game in the player one*/
+        this.turn = 1;
+        this.GeneralTurn = PLAYER1;
+        
+        /*Game variables.*/
+        playing = true;
+        finished = false;
+                
+        /*Change the turn.*/
+        changeTurn();
+        
+    }
+    
+    public int algorithmType(String algorithm){
+        int type=0;
+        if(algorithm == "DFS")
+            type = 1;
+        else
+            type = 2;
+        return type;
+    }
+    
+    public boolean pickUp(){
 
-        /*Comprobamos que los campos estén llenos.*/
+        /*We found that the fields are filled.*/
         if( this.textField1.getText().equals("") ){
             message.showMessageDialog(this,"Fill player 1 name please.","[X] Error:",JOptionPane.ERROR_MESSAGE);
             return false;   
@@ -90,12 +131,7 @@ public class FrmGame extends javax.swing.JFrame implements ActionListener{
         if( this.textField1.getText().equals( this.textField2.getText() )){
             message.showMessageDialog(this,"Write diferents names to players.","[X] Error:",JOptionPane.ERROR_MESSAGE);
             return false;
-        }
-        
-        /*Recojemos los valores.*/
-        this.player1 = this.textField1.getText();
-        this.player2 = this.textField2.getText();
-        
+        }                
         return true;
     }
 
@@ -126,6 +162,8 @@ public class FrmGame extends javax.swing.JFrame implements ActionListener{
         panelImage3 = new org.edisoncor.gui.panel.PanelImage();
         panel2 = new org.edisoncor.gui.panel.Panel();
         labelMetric5 = new org.edisoncor.gui.label.LabelMetric();
+        buttonSeven1 = new org.edisoncor.gui.button.ButtonSeven();
+        buttonSeven2 = new org.edisoncor.gui.button.ButtonSeven();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setBackground(new java.awt.Color(0, 0, 0));
@@ -216,16 +254,16 @@ public class FrmGame extends javax.swing.JFrame implements ActionListener{
                     .addGroup(panelShadow1Layout.createSequentialGroup()
                         .addComponent(labelMetric1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(textField1, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(panelImage5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(textField1, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(panelShadow1Layout.createSequentialGroup()
                         .addComponent(labelMetric2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(textField2, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(panelImage4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(19, 19, 19))
+                        .addComponent(textField2, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(18, 18, 18)
+                .addGroup(panelShadow1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(panelImage5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(panelImage4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelShadow1Layout.createSequentialGroup()
                 .addGap(28, 28, 28)
                 .addComponent(buttonRound1, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -236,7 +274,7 @@ public class FrmGame extends javax.swing.JFrame implements ActionListener{
         panelShadow1Layout.setVerticalGroup(
             panelShadow1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panelShadow1Layout.createSequentialGroup()
-                .addGroup(panelShadow1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                .addGroup(panelShadow1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(panelShadow1Layout.createSequentialGroup()
                         .addGap(30, 30, 30)
                         .addGroup(panelShadow1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -247,12 +285,12 @@ public class FrmGame extends javax.swing.JFrame implements ActionListener{
                             .addComponent(labelMetric2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(textField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(59, 59, 59))
-                    .addGroup(panelShadow1Layout.createSequentialGroup()
-                        .addGap(19, 19, 19)
-                        .addComponent(panelImage5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelShadow1Layout.createSequentialGroup()
+                        .addContainerGap()
                         .addComponent(panelImage4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(34, 34, 34)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(panelImage5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(42, 42, 42)))
                 .addGroup(panelShadow1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(buttonRound2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(buttonRound1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -261,16 +299,14 @@ public class FrmGame extends javax.swing.JFrame implements ActionListener{
 
         panelShadow5.setBorder(javax.swing.BorderFactory.createMatteBorder(1, 1, 1, 1, new java.awt.Color(0, 153, 153)));
 
-        labelMetric4.setText("Algorithm: ");
-
         javax.swing.GroupLayout panelShadow5Layout = new javax.swing.GroupLayout(panelShadow5);
         panelShadow5.setLayout(panelShadow5Layout);
         panelShadow5Layout.setHorizontalGroup(
             panelShadow5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panelShadow5Layout.createSequentialGroup()
-                .addGap(24, 24, 24)
+                .addContainerGap()
                 .addComponent(labelMetric4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(144, Short.MAX_VALUE))
+                .addContainerGap(236, Short.MAX_VALUE))
         );
         panelShadow5Layout.setVerticalGroup(
             panelShadow5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -316,6 +352,24 @@ public class FrmGame extends javax.swing.JFrame implements ActionListener{
 
         labelMetric5.setToolTipText("");
 
+        buttonSeven1.setForeground(new java.awt.Color(0, 0, 0));
+        buttonSeven1.setText("new Game");
+        buttonSeven1.setColorDeSombra(new java.awt.Color(153, 153, 153));
+        buttonSeven1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonSeven1ActionPerformed(evt);
+            }
+        });
+
+        buttonSeven2.setForeground(new java.awt.Color(0, 0, 0));
+        buttonSeven2.setText("reset Game");
+        buttonSeven2.setColorDeSombra(new java.awt.Color(153, 153, 153));
+        buttonSeven2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonSeven2ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout panelShadow2Layout = new javax.swing.GroupLayout(panelShadow2);
         panelShadow2.setLayout(panelShadow2Layout);
         panelShadow2Layout.setHorizontalGroup(
@@ -323,18 +377,27 @@ public class FrmGame extends javax.swing.JFrame implements ActionListener{
             .addGroup(panelShadow2Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(panelShadow2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(labelMetric5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(panelImage3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(labelMetric5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(panelShadow2Layout.createSequentialGroup()
+                        .addComponent(buttonSeven1, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(buttonSeven2, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         panelShadow2Layout.setVerticalGroup(
             panelShadow2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panelShadow2Layout.createSequentialGroup()
-                .addGap(13, 13, 13)
+                .addContainerGap()
                 .addComponent(labelMetric5, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(panelImage3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(72, Short.MAX_VALUE))
+                .addGap(18, 18, 18)
+                .addGroup(panelShadow2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(buttonSeven1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(buttonSeven2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout panelImage1Layout = new javax.swing.GroupLayout(panelImage1);
@@ -343,11 +406,11 @@ public class FrmGame extends javax.swing.JFrame implements ActionListener{
             panelImage1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panelImage1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(panelShadow1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(panelShadow1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(panelShadow2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(panelShadow5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(panelShadow5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
         );
         panelImage1Layout.setVerticalGroup(
@@ -406,27 +469,93 @@ public class FrmGame extends javax.swing.JFrame implements ActionListener{
 
     private void buttonRound1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonRound1ActionPerformed
         // TODO add your handling code here:
-        if(recojer()){
-            SwingUtils.setEnableContainer(panelShadow2, true);
-            this.turn = 0;
-            this.player1 = this.textField1.getText();
-            this.player2 = this.textField2.getText();
-
-            int random = (int)(Math.random()*10);
-            if(random <= 5)
-            mensaje("Turno de " + this.textField1.getText() );
-            else
-            mensaje("Turno de " + this.textField2.getText() );
-        }
+        if(pickUp()){
+            SwingUtils.setEnableContainer(panelImage3, true);
+            starGame();
+            SwingUtils.setEnableContainer(panelShadow1, false);
+        }        
     }//GEN-LAST:event_buttonRound1ActionPerformed
 
-    public void mensaje(String mensaje){
-        this.labelMetric5.setText(mensaje);
+    public void move( Box mark ){
+        /*Put the mark.*/
+        if ( playing ){
+            
+            if( !THINKING )
+                putMarkPlayer( mark );            
+            
+            if ( this.type_game == MANvsCOMPUTER && this.turn == PLAYER2 ){
+                THINKING = true;
+                putMarkComputer(computer.move( this.Board ));
+                THINKING = false;    
+            }
+
+        }
+        /*new game*/
+        if( finished ){
+            resetGame();
+            return;
+        }
+        
+        /*Aek if the game finished or win someone.*/
+        if ( finished() != 0){
+                        
+            /*show the win message.*/
+            if ( finished() == 1 ){
+                message(player1 + " win!!");
+            }else{
+                message(player2 + " win!!");
+            }
+            
+            /*Stop the game.*/
+            playing = false;
+            finished = true;
+            
+            
+        } else if ( full() ){
+            message("Equals !!");
+            
+            /*Stop the actual game.*/
+            playing = false;
+            finished = true;
+        }
+        
+        /*Change the turn of the player.*/
+        changeTurn();
+    }
+    
+    
+    /*Change turn*/
+    public void changeTurn(){
+        
+        /*if we're playing.*/
+        if ( !playing )
+            return;
+        
+        /*If the turn is of the player one..*/
+        if ( turn == PLAYER1 )
+            message("Turn of " + player1 );
+        else
+            message("Turn of " + player2 );              
+    }
+    
+    public void message(String message){
+        this.labelMetric5.setText(message);
     }
     
     private void buttonRound2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonRound2ActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_buttonRound2ActionPerformed
+
+    private void buttonSeven1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonSeven1ActionPerformed
+      FrmMenuOponent menu = new FrmMenuOponent();
+      menu.setVisible(true);
+      this.setVisible(false);
+    }//GEN-LAST:event_buttonSeven1ActionPerformed
+
+    private void buttonSeven2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonSeven2ActionPerformed
+        resetGame();
+        SwingUtils.setEnableContainer(panelImage3, true);
+    }//GEN-LAST:event_buttonSeven2ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -435,6 +564,8 @@ public class FrmGame extends javax.swing.JFrame implements ActionListener{
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private org.edisoncor.gui.button.ButtonRound buttonRound1;
     private org.edisoncor.gui.button.ButtonRound buttonRound2;
+    private org.edisoncor.gui.button.ButtonSeven buttonSeven1;
+    private org.edisoncor.gui.button.ButtonSeven buttonSeven2;
     private org.edisoncor.gui.label.LabelMetric labelMetric1;
     private org.edisoncor.gui.label.LabelMetric labelMetric2;
     private org.edisoncor.gui.label.LabelMetric labelMetric4;
@@ -458,233 +589,139 @@ public class FrmGame extends javax.swing.JFrame implements ActionListener{
         for (int i = 0; i < 3; i++){
             for (int j = 0; j < 3; j++){
                 if(e.getSource()== BOARD[i][j].A){
-                  //if(BOARD[i][j].isGAP()){  
-                    putMark(BOARD[i][j]);
-                    cont ++ ;
-                    /*if(revisar()){
-                        JOptionPane.showMessageDialog(null, "UD. ha Ganado");
-                        SwingUtils.setEnableContainer(panelShadow2, false);
-                    }*/
-                    
-                  //}else{
-                    //  JOptionPane.showMessageDialog(null, "Movimiento no valido");
-                  //}
-                    //System.out.println(i+" , "+j);
+                    move(BOARD[i][j]);
+                    System.out.println(i+" , "+j);
                 }
             }
         }
     }
     
-    public void putMark(Box button){
+    public void putMarkPlayer(Box button){
         ImageIcon icon = null;
-        if(this.turn == 0){
-            icon = new ImageIcon(this.getClass().getResource("/imagesAI/o.gif"));
-            icon = new ImageIcon(icon.getImage().getScaledInstance( 90, 90, java.awt.Image.SCALE_DEFAULT));
-            //button.A.setDisabledIcon(icon);
-            button.A.setIcon(icon);
-            this.turn = 1;
-            button.B = 4;
-            if(revisar()){
-//                this.labelMetric5.setText("Ha ganado "+this.player1);
-                winner = this.player1;
-                JOptionPane.showMessageDialog(null, this.winner+" ha Ganado");
-                resetGame();
-                SwingUtils.setEnableContainer(panel2, false);
-            }
-            this.labelMetric5.setText("Turno de "+this.player2);
-                    
-        }else{
-            icon = new ImageIcon(this.getClass().getResource("/imagesAI/x.png"));
-            icon = new ImageIcon(icon.getImage().getScaledInstance( 90, 90, java.awt.Image.SCALE_DEFAULT));
-            //button.A.setDisabledIcon(icon);
-            button.A.setIcon(icon);
-            this.turn = 0;
-            button.B = 1;
-            if(revisar()){
-//                this.labelMetric5.setText("Ha ganado "+this.player2);
-                winner = this.player2;
-                JOptionPane.showMessageDialog(null, this.winner+" ha Ganado");
-                SwingUtils.setEnableContainer(panel2, false);
-            }
-            this.labelMetric5.setText("Turno de "+this.player1);
-        }
-        /*icon = new ImageIcon(icon.getImage().getScaledInstance( 90, 90, java.awt.Image.SCALE_DEFAULT));
-        button.A.setIcon(icon);*/
+        
+        if ( !button.GAP )
+            return;
+        
+        if(this.turn == PLAYER1)
+            setBoxImage(button,"/imagesAI/o.gif");            
+        else
+            setBoxImage(button,"/imagesAI/x.png");//            
+        /**/
+        /*store in the board the player representation */
+        Board[button.getIndex()] = turn;
+        
+        /*Change turn.*/
+        turn = ( turn == PLAYER1 ) ? PLAYER2 : PLAYER1;
+    }
+    
+    public void setBoxImage(Box button, String url){
+        ImageIcon icon = null;
+        icon = new ImageIcon(this.getClass().getResource(url));
+        icon = new ImageIcon(icon.getImage().getScaledInstance( 90, 90, java.awt.Image.SCALE_DEFAULT));
+        button.A.setIcon(icon);
+        button.setGAP(false);
         button.A.removeActionListener(this);
     }
     
-    public boolean revisar(){
-        boolean gano = false;
-        int suma = 0;
+    public void putMarkComputer( int index ){
+        int cont = 0;
+        if( index == -1 ) return;
         for(int i = 0; i < 3; i++){
-            suma = BOARD[i][0].B + BOARD[i][1].B + BOARD[i][2].B;
-            if(suma == 3 || suma == 12){
-                gano = true;
-                break;
+            for(int j = 0; j < 3; j++){
+                if(index == cont)
+                    setBoxImage(BOARD[i][j],"/imagesAI/x.png");
+                cont ++ ; 
             }
         }
-        
-        for(int i = 0; i < 3; i++){
-            suma = BOARD[0][i].B + BOARD[1][i].B + BOARD[2][i].B;
-            if(suma == 3 || suma == 12){
-                gano = true;
-                break;
-            }
-        }
-        
-        suma = 0;
-        suma = BOARD[0][0].B + BOARD[1][1].B + BOARD[2][2].B;
-        if(suma == 3 || suma == 12){
-            gano = true;
-        }
-        
-        suma = 0;
-        suma = BOARD[0][2].B + BOARD[1][1].B + BOARD[2][0].B;
-        if(suma == 3 || suma == 12){
-            gano = true;
-        }
-        
-        return gano;
+        this.Board[index] = 2;
+        /*Change Turn.  */
+        turn = ( turn == PLAYER1 ) ? PLAYER2 : PLAYER1;
     }
     
-    /*Método que pone una ficha por la computadora.*/
-//    public void ponerFichaCPU( int indice ){
-//        
-//        if( indice == -1 ) return;
-//        
-//        switch ( indice ){
-//            case 0: this.f1.setIcon( jugador2.obtenFicha() ); break;
-//            case 1: this.f2.setIcon( jugador2.obtenFicha() ); break;
-//            case 2: this.f3.setIcon( jugador2.obtenFicha() ); break;
-//            case 3: this.f4.setIcon( jugador2.obtenFicha() ); break;
-//            case 4: this.f5.setIcon( jugador2.obtenFicha() ); break;
-//            case 5: this.f6.setIcon( jugador2.obtenFicha() ); break;
-//            case 6: this.f7.setIcon( jugador2.obtenFicha() ); break;
-//            case 7: this.f8.setIcon( jugador2.obtenFicha() ); break;
-//            case 8: this.f9.setIcon( jugador2.obtenFicha() ); break;        
-//        }
-//        
-//        this.tablero[indice] = 2;
-//        
-//        /*Cambiamos el turno.*/
-//        turno = ( turno == JUGADOR1 ) ? JUGADOR2 : JUGADOR1;
-//                
-//    }
+    /*Return 0 if it's tie, 1 if player 1 won y 2 if player 2 won*/
+    public int finished(){
+        /*We check if the game finished.*/
+        /*rows*/
+        if ( Board[0] == Board[1] && Board[0] == Board[2] && Board[0] != 0 )
+            return Board[0];
+        else if ( Board[3] == Board[4] && Board[3] == Board[5]  && Board[3] != 0  )
+            return Board[3];
+        else if ( Board[6] == Board[7] && Board[6]== Board[8]  && Board[6] != 0 )
+            return Board[6];
+        /*Columns*/
+        else if( Board[0] == Board[3] && Board[0] == Board[6]  && Board[0] != 0 )
+            return Board[0];
+        else if ( Board[1] == Board[4] && Board[1] == Board[7]  && Board[1] != 0  )
+            return Board[1];
+        else if ( Board[2] == Board[5] && Board[2] == Board[8]  && Board[2] != 0 )
+            return Board[2];
+        /*Diagonals*/
+        else if ( Board[0] == Board[4] && Board[0] == Board[8] && Board[0] !=0 )
+            return Board[0];
+        else if ( Board[2] == Board[4] && Board[2] == Board[6] && Board[2] != 0 )
+            return Board[2];
+        
+        return 0;
+        
+    }
     
-//    /*Método que "pone una ficha" en el tablero.*/
-//    public void ponerFicha( JLabel ficha ){
-//
-//        /*Obtenemos la casilla.*/
-//        int casilla = Integer.parseInt(""+ficha.getName().charAt(1)) - 1;
-//        
-//        /*Comprobamos si la casilla no estaba ocupada.*/
-//        if ( estaOcupada(casilla ) )
-//            return;
-//        
-//        /*Elegimos la ficha según el turno*/
-//        if ( turno == JUGADOR1 )
-//            ficha.setIcon( jugador1.obtenFicha() );
-//        else
-//            ficha.setIcon( jugador2.obtenFicha() );
-//        
-//        /*Guardamos la representación en el tablero*/
-//        tablero[casilla] = turno;
-//        
-//        /*Cambiamos el turno.*/
-//        turno = ( turno == JUGADOR1 ) ? JUGADOR2 : JUGADOR1;
-//        
-//    }
+    public boolean full(){
+        boolean res = true;
+        for ( int i = 0; i < Board.length; i ++ )
+            if ( Board[i] == 0 ){
+                res = false;
+                break;
+            }
+        
+        return res;
+    }
     
-//    /*Método que dice si el juego está terminado.*/
-//    /*Regresa 0 si nadie gana, 1 si gana jugador 1 y 2 si gana jugador 2*/
-//    public int terminado(){
-//        /*Comprobamos si el juego terminó.*/
-//        /*Filas*/
-//        if ( tablero[0] == tablero[1] && tablero[0] == tablero[2] && tablero[0] != 0 )
-//            return tablero[0];
-//        else if ( tablero[3] == tablero[4] && tablero[3] == tablero[5]  && tablero[3] != 0  )
-//            return tablero[3];
-//        else if ( tablero[6] == tablero[7] && tablero[6]== tablero[8]  && tablero[6] != 0 )
-//            return tablero[6];
-//        /*Columnas*/
-//        else if( tablero[0] == tablero[3] && tablero[0] == tablero[6]  && tablero[0] != 0 )
-//            return tablero[0];
-//        else if ( tablero[1] == tablero[4] && tablero[1] == tablero[7]  && tablero[1] != 0  )
-//            return tablero[1];
-//        else if ( tablero[2] == tablero[5] && tablero[2] == tablero[8]  && tablero[2] != 0 )
-//            return tablero[2];
-//        /*Diagonales*/
-//        else if ( tablero[0] == tablero[4] && tablero[0] == tablero[8] && tablero[0] !=0 )
-//            return tablero[0];
-//        else if ( tablero[2] == tablero[4] && tablero[2] == tablero[6] && tablero[2] != 0 )
-//            return tablero[2];
-//        
-//        return 0;
-//        
-//    }
-    
-    /*Método que nos dice si el tablero se llenó.*/
-//    public boolean lleno(){
-//        boolean res = true;
-//        for ( int i = 0; i < tablero.length; i ++ )
-//            if ( tablero[i] == 0 )
-//                res = false;
-//        
-//        return res;
-//    }
-    
-//    /*Método que nos dice si una casilla está ocupada.*/
-//    public boolean estaOcupada( int casilla ){
-//        return ( tablero[casilla] != 0 );
-//    }
-//    
     public void fillBoard(){
+        int index = 0;
         BOARD =new Box[3][3];
         ImageIcon icon=null;
         for( int i = 0; i < 3; i++){
             for (int j = 0; j < 3; j++){
                 BOARD [i][j] = new Box();
                 BOARD [i][j].A.setBounds((i*45)+10, (j*45)+10, 42, 42);
-                //BOARD [i][j].A.setRolloverIcon(new ImageIcon("/images/ai3.png"));
-                //Boton.setRolloverIcon (new ImageIcon("Devil.gif"));
-                //icon = new ImageIcon(this.getClass().getResource("/imagesAI/x.png"));
-                //icon = new ImageIcon(icon.getImage().getScaledInstance( 90, 90, java.awt.Image.SCALE_DEFAULT));
-                //BOARD [i][j].A.setIcon(icon);
-                //button.A.setIcon(icon);
                 BOARD [i][j].A.addActionListener(this);
+                BOARD [i][j].setIndex(index);
                 this.panel2.add(BOARD[i][j].A);
+                index++;
             }
         }    
     }
     
-    /*Método que inicia un nuevo juego.*/
     public void resetGame(){
         
-        //Llenamos el tablero con 0s*/
+        //fill the Board with 0s*/
         Arrays.fill(Board,0);
-        
+        int cont=0;
         for( int i = 0; i < 3; i++){
             for (int j = 0; j < 3; j++){
                 BOARD [i][j].A.setIcon(null);
-                BOARD [i][j].B = 0;
+                BOARD [i][j].A.addActionListener(this);
+                BOARD [i][j].setGAP(true);
+                System.out.println(Board[cont]);
+                cont ++;
             }
         }
         
-        /*Cambiamos el turno General.*/
-        if ( this.player2 == "Maquina" )
+        /*Change the General Turn.*/
+        if ( this.type_game == MANvsCOMPUTER )
             GeneralTurn = PLAYER1;
         else
             GeneralTurn = ( GeneralTurn == PLAYER1 ) ? PLAYER2 : PLAYER1;
         
         turn = GeneralTurn;
         
-        /*Jugando.*/
+        /*Playing.*/
         if ( turn == PLAYER1 )
-            mensaje( "Turn of " +player1);
+            message( "Turn of " +player1);
         else
-            mensaje( "Turn of " +player2);
+            message( "Turn of " +player2);
         
         playing = true;
         finished = false;
-    }    
+    }   
 }

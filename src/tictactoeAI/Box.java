@@ -12,13 +12,13 @@ package tictactoeAI;
  */
 public class Box {
     org.edisoncor.gui.button.ButtonIcon A;
-    int B;
-    boolean GAP;
+    int index;
+    int B = 0;
+    boolean GAP = true;
     
     public Box(){
-        A = new org.edisoncor.gui.button.ButtonIcon();
-        B = -1;
-        GAP = true;
+        this.A = new org.edisoncor.gui.button.ButtonIcon();
+        
     }
 
     public int getB() {
@@ -37,4 +37,11 @@ public class Box {
         this.GAP = GAP;
     }
     
+    public int getIndex(){
+        return this.index;
+    }
+    
+    public void setIndex(int index){
+        this.index = index;
+    }
 }
